@@ -1,0 +1,106 @@
+import React, { useState, useEffect } from "react";
+import { vehicle as vehicleApi } from "../../../api";
+import { message } from 'antd';
+
+function Map() {
+  const [map, setMap] = useState(null);
+  useEffect(() => {
+    /**
+     * 全局参数设置
+     */
+    minemap.domainUrl = "//minedata.cn";
+    minemap.dataDomainUrl = "//minedata.cn";
+    minemap.serverDomainUrl = "//minedata.cn";
+    minemap.spriteUrl = "//minedata.cn/minemapapi/v2.1.0/sprite/sprite";
+    minemap.serviceUrl = "//minedata.cn/service/";
+
+    minemap.key = "16be596e00c44c86bb1569cb53424dc9";
+    minemap.solution = 12877;
+
+    const map = new minemap.Map({
+      container: "map",
+      style: minemap.domainUrl + "/service/solu/style/id/12612",
+      center: [120.647445, 31.416957],
+      zoom: 12,
+      pitch: 0,
+      maxZoom: 17,
+      minZoom: 3,
+      projection: "MERCATOR",
+      logoControl: false
+    });
+    map.addControl(new minemap.Navigation(), 'bottom-right');
+    map.addControl(new minemap.Fullscreen(), 'top-right');
+    map.addControl(new minemap.Scale(), 'bottom-left');
+
+    map.on("click", (e: any) => {
+      console.info([e.lngLat.lng, e.lngLat.lat]);
+    });
+    setMap(map);
+  }, []);
+
+  const [vehicles, setVehicles] = useState([]);
+  useEffect(() => {
+    let timer: any = null;
+    const getVehicles = () => {
+      let atHomePage = window.location.href.includes("/desktop/home");
+      if (!atHomePage){
+        timer = setTimeout(getVehicles, 1000);
+        return;
+      }
+      vehicleApi.getVehiclesPosition().then(v => {
+        if (v.code === 0) {
+          setVehicles(v.data);
+          timer = setTimeout(getVehicles, 1000);
+        } else {
+          message.error("出错了");
+        }
+      });
+    };
+
+    getVehicles();
+
+    return () => {
+      clearTimeout(timer);
+    }
+  }, []);
+
+  const [popups, setPopups] = useState([]);
+  const [makers, setMakers] = useState([]);
+  useEffect(() => {
+    if (map) {
+      // 删除所有markers和popups
+      makers.forEach((item: any) => item.remove());
+      popups.forEach((item: any) => item.remove());
+
+      let _popups: any = [];
+      let _markers: any = [];
+      vehicles.forEach((item: any) => {
+
+        let popup = new minemap.Popup({ closeOnClick: true, closeButton: false, offset: [0, -20] })
+          .setLngLat([item.lon, item.lat])
+          .setHTML(`
+          <h4>${item.vehicleNo}</h4>
+        `).addTo(map);
+        _popups.push(popup);
+
+        let marker = new minemap.Marker({
+          color: '#f30',
+          rotation: 0,
+          pitchAlignment: 'map',
+          rotationAlignment: 'map',
+          scale: 0.6
+        }).setLngLat([item.lon, item.lat])
+          .addTo(map);
+        _markers.push(marker);
+      });
+      setPopups(_popups);
+      setMakers(_markers);
+    }
+  }, [map, vehicles]);
+  return (
+    <div id="map">
+    </div>
+  );
+}
+
+export default React.memo(Map);
