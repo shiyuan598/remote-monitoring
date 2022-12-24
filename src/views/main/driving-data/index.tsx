@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import { useHistory, useLocation } from "react-router-dom";
 import * as echarts from "echarts";
 import { Select } from "antd";
 
@@ -15,6 +16,11 @@ type chartOptions = {
 };
 
 export default function App() {
+
+  const history = useHistory();
+  const location = useLocation();
+  console.info(history.location.state);
+  
     const [selected, setSelected] = useState("realtime-position");
     const [chartObj, setChartObj] = useState<echarts.ECharts>();
     const chartContainer = useRef<HTMLDivElement>(null);
@@ -104,10 +110,10 @@ export default function App() {
     return (
         <>
             <ul className="tabs clearfix">
-                <li className="tab active">车型ABC001</li>
-                <li className="tab">车型ABC002</li>
-                <li className="tab">车型ABC003</li>
-                <li className="tab">车型ABC004</li>
+                <li className="tab top active">车型ABC001</li>
+                <li className="tab top">车型ABC002</li>
+                <li className="tab top">车型ABC003</li>
+                <li className="tab top">车型ABC004</li>
             </ul>
             <div className="info active">车型_车牌号_VIN码_智驾系统零部件_软件版本_离线</div>
             <div className="card-container">

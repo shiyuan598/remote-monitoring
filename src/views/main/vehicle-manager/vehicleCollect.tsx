@@ -4,6 +4,9 @@ import style from "./style.module.scss";
 
 export default function App() {
     const [form] = Form.useForm();
+    const handleOk = () => {
+        form.submit();
+    };
     const onFinish = (values: any) => {
         console.log("Received values of form: ", values);
     };
@@ -42,7 +45,7 @@ export default function App() {
                 </Form.Item>
             </Form>
             <div className={style.buttons}>
-                <Button size="small" type="primary">
+                <Button onClick={handleOk} size="small" type="primary">
                     录入
                 </Button>
             </div>

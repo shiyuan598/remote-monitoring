@@ -65,6 +65,10 @@ $colorActive: #447ed9;
         background-color: #f9f9f9;
         cursor: pointer;
     }
+    .tab.top {
+      @include bordered;
+        border-bottom: 0;
+    }
 
     .tab+.tab {
         border-left: 0;

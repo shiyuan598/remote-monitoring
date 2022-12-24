@@ -15,7 +15,7 @@ root.render(
                 locale={zhCN}
                 theme={{
                     token: {
-                        colorPrimary: "#447ed9"
+                        colorPrimary: "#1f63ff"
                     }
                 }}>
                 <App />

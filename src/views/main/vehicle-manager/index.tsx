@@ -22,7 +22,7 @@ export default function App() {
             <ul className="tabs clearfix">
                 {tabs.map(item => (
                     <li
-                        className={`tab ${tab === item.id ? "active" : ""}`}
+                        className={`tab top ${tab === item.id ? "active" : ""}`}
                         key={item.id}
                         onClick={() => {
                             setTab(item.id);

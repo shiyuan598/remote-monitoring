@@ -78,10 +78,10 @@ export default function App() {
     return (
         <>
             <ul className="tabs clearfix">
-                <li className="tab active">车型ABC001</li>
-                <li className="tab">车型ABC002</li>
-                <li className="tab">车型ABC003</li>
-                <li className="tab">车型ABC004</li>
+                <li className="tab top active">车型ABC001</li>
+                <li className="tab top">车型ABC002</li>
+                <li className="tab top">车型ABC003</li>
+                <li className="tab top">车型ABC004</li>
             </ul>
             <div className="info disable">车型_车牌号_VIN码_智驾系统零部件_软件版本_离线</div>
             <div className="card-container">

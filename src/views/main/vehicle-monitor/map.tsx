@@ -8,16 +8,6 @@ function Map() {
     /**
      * 全局参数设置
      */
-    // minemap.domainUrl = "//minedata.cn";
-    // minemap.dataDomainUrl = "//minedata.cn";
-    // minemap.serverDomainUrl = "//minedata.cn";
-    // minemap.spriteUrl = "//minedata.cn/minemapapi/v2.1.0/sprite/sprite";
-    // minemap.serviceUrl = "//minedata.cn/service/";
-
-    // minemap.key = "ca78282dfff148e3be5390ce027068f5";
-    // minemap.solution = 11001;
-
-
     minemap.domainUrl = 'https://minemap.minedata.cn';
     minemap.dataDomainUrl = 'https://minemap.minedata.cn';
     minemap.serverDomainUrl = 'https://sd-data.minedata.cn';

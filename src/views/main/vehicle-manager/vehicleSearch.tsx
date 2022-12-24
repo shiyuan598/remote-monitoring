@@ -6,6 +6,12 @@ const { RangePicker } = DatePicker;
 
 export default function App() {
     const [form] = Form.useForm();
+    const handleOk = () => {
+        form.submit();
+    };
+    const handleReset = () => {
+        form.resetFields();
+    };
     const onFinish = (values: any) => {
         console.log("Received values of form: ", values);
     };
@@ -34,17 +40,15 @@ export default function App() {
                 <Form.Item name="sysParts" label="智驾系统零部件">
                     <Select placeholder="请选择" />
                 </Form.Item>
-                <Form.Item  name="date" label="创建日期">
-                <RangePicker
-                            size="small"
-                        />
+                <Form.Item name="date" label="创建日期">
+                    <RangePicker size="small" />
                 </Form.Item>
             </Form>
             <div className={style.buttons}>
-                <Button size="small" type="primary">
+                <Button onClick={handleOk} size="small" type="primary">
                     录入
                 </Button>
-                <Button size="small" disabled>
+                <Button onClick={handleReset} size="small" disabled>
                     重置
                 </Button>
             </div>

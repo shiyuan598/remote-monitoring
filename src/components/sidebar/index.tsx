@@ -101,7 +101,10 @@ export default function App() {
     const location = useLocation();
     const history = useHistory();
     const onClick = (key: string) => {
-        history.push(key); // 跳转到对应的路由
+        history.push(key, {
+          name: "yhifif",
+          age: 25
+        }); // 跳转到对应的路由
     };
 
     const [selected, setSelected] = useState("");
