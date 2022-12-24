@@ -141,8 +141,9 @@ $colorActive: #447ed9;
     }
 }
 .map-container {
-    height: calc(100% - 40px - 150px);
+    // height: calc(100% - 40px - 150px);
     #map {
+        min-height: 450px;
         height: calc(100% - 45px);
     }
 }

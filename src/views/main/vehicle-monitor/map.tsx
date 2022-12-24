@@ -8,18 +8,27 @@ function Map() {
     /**
      * 全局参数设置
      */
-    minemap.domainUrl = "//minedata.cn";
-    minemap.dataDomainUrl = "//minedata.cn";
-    minemap.serverDomainUrl = "//minedata.cn";
-    minemap.spriteUrl = "//minedata.cn/minemapapi/v2.1.0/sprite/sprite";
-    minemap.serviceUrl = "//minedata.cn/service/";
+    // minemap.domainUrl = "//minedata.cn";
+    // minemap.dataDomainUrl = "//minedata.cn";
+    // minemap.serverDomainUrl = "//minedata.cn";
+    // minemap.spriteUrl = "//minedata.cn/minemapapi/v2.1.0/sprite/sprite";
+    // minemap.serviceUrl = "//minedata.cn/service/";
 
-    minemap.key = "16be596e00c44c86bb1569cb53424dc9";
-    minemap.solution = 12877;
+    // minemap.key = "ca78282dfff148e3be5390ce027068f5";
+    // minemap.solution = 11001;
+
+
+    minemap.domainUrl = 'https://minemap.minedata.cn';
+    minemap.dataDomainUrl = 'https://minemap.minedata.cn';
+    minemap.serverDomainUrl = 'https://sd-data.minedata.cn';
+    minemap.spriteUrl = 'https://minemap.minedata.cn/minemapapi/v3.4.0/sprite/sprite';
+    minemap.serviceUrl = 'https://service.minedata.cn/service';
+    minemap.key = "ca78282dfff148e3be5390ce027068f5";
+    minemap.solution = 11001;
 
     const map = new minemap.Map({
       container: "map",
-      style: minemap.domainUrl + "/service/solu/style/id/12612",
+      style: "https://service.minedata.cn/map/solu/style/11001",
       center: [120.647445, 31.416957],
       zoom: 12,
       pitch: 0,
