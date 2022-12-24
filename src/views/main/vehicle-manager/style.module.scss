@@ -1,0 +1,40 @@
+$colorNormal: #fff;
+$colorActive: #447ed9;
+
+@mixin active {
+    color: $colorNormal;
+    background-color: $colorActive;
+}
+
+@mixin disable {
+    color: $colorNormal;
+    background-color: #989898;
+}
+
+@mixin bordered {
+    border: 1px solid #eee;
+}
+
+.form-container {
+    display: flex;
+    padding: 25px 20px;
+    @include bordered;
+    background-color: #fff;
+    :global(.ant-form) {
+        width: calc(100% - 60px);
+        flex: 1;
+        display: flex;
+        flex-wrap: wrap;
+        :global(.ant-form-item) {
+            width: calc((100%) / 3 - 40px);
+            margin-right: 40px;
+        }
+    }
+    .buttons {
+        flex: 0 0 60px;
+        :global(.ant-btn) {
+            width: 60px;
+            margin-bottom: 24px;
+        }
+    }
+}

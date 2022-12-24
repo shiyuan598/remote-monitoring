@@ -56,6 +56,7 @@ $colorActive: #447ed9;
         float: left;
         height: 40px;
         line-height: 40px;
+        font-size: 14px;
         width: 150px;
         text-align: center;
         @include bordered;
@@ -95,6 +96,7 @@ $colorActive: #447ed9;
     min-height: 40px;
     line-height: 40px;
     padding-left: 25px;
+    font-size: 14px;
 }
 
 .info.active {
@@ -111,6 +113,7 @@ $colorActive: #447ed9;
     @include bordered;
     background-color: $colorNormal;
     .text {
+        font-size: 13px;
         margin: 15px 10px 30px;
     }
 }
@@ -151,3 +154,11 @@ $colorActive: #447ed9;
 }
 
 // 异常信息
+
+
+// 车辆管理
+.form-container {
+    padding: 25px 20px;
+    @include bordered;
+    background-color: #fff;
+}

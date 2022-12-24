@@ -79,6 +79,21 @@ const menus = [
                 label: "报表管理"
             }
         ]
+    },
+    {
+        id: "0-4",
+        key: "/main/vehicle-manager",
+        label: "车辆录入和管理",
+        subMenu: [
+            {
+                id: "0-4-1",
+                label: "车辆录入"
+            },
+            {
+                id: "0-4-2",
+                label: "车辆管理"
+            }
+        ]
     }
 ];
 

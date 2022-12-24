@@ -29,8 +29,8 @@ export default function App() {
                 top: 40,
                 right: 30,
                 bottom: 40,
-                left: 60,
-              },
+                left: 60
+            },
             legend: {
                 orient: "vertical",
                 top: 0,
@@ -46,6 +46,9 @@ export default function App() {
                 itemStyle: {
                     opacity: 0
                 }
+            },
+            tooltip: {
+                trigger: "axis"
             },
             xAxis: {
                 type: "category",
@@ -67,12 +70,14 @@ export default function App() {
                 {
                     name: "平均油耗",
                     type: "line",
+                    smooth: true,
                     data: [34, 43, 32, 7, 59, 60, 56],
                     showSymbol: false
                 },
                 {
                     name: "人工驾驶平均油耗",
                     type: "line",
+                    smooth: true,
                     data: [123, 245, 467, 38, 9, 65, 78],
                     showSymbol: false
                 },
@@ -80,6 +85,7 @@ export default function App() {
                     name: "自动驾驶平均油耗",
                     data: [150, 230, 224, 218, 135, 147, 260],
                     type: "line",
+                    smooth: true,
                     showSymbol: false
                 }
             ]
@@ -135,6 +141,7 @@ export default function App() {
                 <div className="category">油耗统计</div>
                 <div>
                     <Select
+                        size="small"
                         defaultValue="1"
                         style={{ width: 120, marginBottom: 13 }}
                         onChange={v => {}}

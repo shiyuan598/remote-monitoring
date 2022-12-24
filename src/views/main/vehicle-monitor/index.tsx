@@ -1,6 +1,10 @@
 import React, { useState } from "react";
-import { Select } from "antd";
+import { Select, DatePicker } from "antd";
+import dayjs from "dayjs";
+import type { Dayjs } from "dayjs";
 import Map from "./map";
+
+const { RangePicker } = DatePicker;
 
 const tabs = [
     {
@@ -17,7 +21,15 @@ const tabs = [
     }
 ];
 export default function App() {
-    const [selected, setSelected] = useState("realtime-position");
+    const [tab, setTab] = useState("realtime-position");
+    const onChange = (dates: null | (Dayjs | null)[], dateStrings: string[]) => {
+        if (dates) {
+            console.log("From: ", dates[0], ", to: ", dates[1]);
+            console.log("From: ", dateStrings[0], ", to: ", dateStrings[1]);
+        } else {
+            console.log("Clear");
+        }
+    };
 
     return (
         <>
@@ -52,38 +64,52 @@ export default function App() {
             <ul className="tabs clearfix">
                 {tabs.map(item => (
                     <li
-                        className={`tab ${selected === item.id ? "active" : ""}`}
+                        className={`tab ${tab === item.id ? "active" : ""}`}
                         key={item.id}
                         onClick={() => {
-                            setSelected(item.id);
+                            setTab(item.id);
                         }}>
                         {item.label}
                     </li>
                 ))}
             </ul>
             <div className="statis-container map-container">
-                {selected === "realtime-position" ? (
+                {tab === "realtime-position" ? (
                     <div className="category">实时位置</div>
                 ) : (
-                    <Select
-                        defaultValue="J7A01"
-                        style={{ width: 120, marginBottom: 13 }}
-                        onChange={v => {}}
-                        options={[
-                            {
-                                value: "1",
-                                label: "J7A01"
-                            },
-                            {
-                                value: "3",
-                                label: "J7A02"
-                            },
-                            {
-                                value: "6",
-                                label: "J7A03"
-                            }
-                        ]}
-                    />
+                    <>
+                        <Select
+                            size="small"
+                            defaultValue="J7A01"
+                            style={{ width: 120, marginBottom: 13 }}
+                            onChange={v => {}}
+                            options={[
+                                {
+                                    value: "1",
+                                    label: "J7A01"
+                                },
+                                {
+                                    value: "3",
+                                    label: "J7A02"
+                                },
+                                {
+                                    value: "6",
+                                    label: "J7A03"
+                                }
+                            ]}
+                        />
+                        <RangePicker
+                            size="small"
+                            style={{ marginLeft: "20px" }}
+                            presets={[
+                                { label: "今天", value: [dayjs(), dayjs()] },
+                                { label: "7天", value: [dayjs().add(-6, "d"), dayjs()] },
+                                { label: "14天", value: [dayjs().add(-13, "d"), dayjs()] },
+                                { label: "30天", value: [dayjs().add(-29, "d"), dayjs()] }
+                            ]}
+                            onChange={onChange}
+                        />
+                    </>
                 )}
                 <Map></Map>
             </div>
