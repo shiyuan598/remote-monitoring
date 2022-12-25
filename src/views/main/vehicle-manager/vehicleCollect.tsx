@@ -1,14 +1,21 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useContext } from "react";
 import { Button, Form, Input, Select } from "antd";
 import style from "./style.module.scss";
+import { Context } from "./context";
 
 export default function App() {
+    const { vehicleNo, setVehicleNo } = useContext(Context) as {
+        vehicleNo: number;
+        setVehicleNo: Function;
+    };
     const [form] = Form.useForm();
     const handleOk = () => {
+      setVehicleNo(vehicleNo + 1);
         form.submit();
     };
     const onFinish = (values: any) => {
         console.log("Received values of form: ", values);
+
     };
     return (
         <div className={style["form-container"]}>

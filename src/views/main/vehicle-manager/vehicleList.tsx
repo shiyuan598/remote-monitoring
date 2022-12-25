@@ -1,8 +1,9 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useContext } from "react";
 import { DeleteOutlined, DownOutlined, RightOutlined, PlusOutlined, FormOutlined } from "@ant-design/icons";
 import { Table } from "antd";
 import type { TableColumnsType } from "antd";
 import style from "./style.module.scss";
+import { Context } from "./context";
 
 interface DataType {
     key: React.Key;
@@ -24,6 +25,14 @@ interface ExpandedDataType {
 }
 
 export default function App() {
+    const { vehicleNo, setVehicleNo } = useContext(Context) as {
+        vehicleNo: number;
+        setVehicleNo: Function;
+    };
+
+    useEffect(()=>{
+      console.info(vehicleNo, "hhehe");
+    }, [vehicleNo])
     const [id, setId] = useState<number>(0);
     const expandedRowRender = (record: DataType, index: number) => {
         console.info(record);
@@ -31,20 +40,21 @@ export default function App() {
             { title: "车型码", dataIndex: "code", key: "code" },
             { title: "配置名称", dataIndex: "name", key: "name" },
             { title: "关键总成信息", dataIndex: "info", key: "info" },
-            { title: "创建日期", dataIndex: "createDate", key: "createDate" },
+            { title: "创建日期", dataIndex: "createDate", key: "createDate", width: 120 },
             {
                 title: "操作",
                 dataIndex: "operation",
                 key: "operation",
+                width: 120,
                 render: () => (
-                    <>
+                    <div style={{ textAlign: "right" }}>
                         <span className={style.action}>
                             <FormOutlined />
                         </span>
                         <span className={style.action}>
                             <DeleteOutlined />
                         </span>
-                    </>
+                    </div>
                 )
             }
         ];
@@ -69,12 +79,13 @@ export default function App() {
         { title: "软件版本", dataIndex: "version", key: "version" },
         { title: "智驾系统零部件", dataIndex: "sysParts", key: "sysParts" },
         { title: "状态", dataIndex: "state", key: "state" },
-        { title: "创建日期", dataIndex: "createDate", key: "createDate" },
+        { title: "创建日期", dataIndex: "createDate", key: "createDate", width: 120 },
         {
             title: "操作",
             key: "operation",
+            width: 120,
             render: (text, record, index) => (
-                <>
+                <div style={{ textAlign: "right" }}>
                     <span className={style.action}>
                         <PlusOutlined />
                     </span>
@@ -84,7 +95,7 @@ export default function App() {
                     <span onClick={() => console.info(record)} className={style.action}>
                         <DeleteOutlined />
                     </span>
-                </>
+                </div>
             )
         }
     ];

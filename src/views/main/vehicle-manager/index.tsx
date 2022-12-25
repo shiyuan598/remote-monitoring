@@ -1,7 +1,8 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, Fragment } from "react";
 import VehicleCollect from "./vehicleCollect";
 import VehicleSearch from "./vehicleSearch";
 import VehicleList from "./vehicleList";
+import {Context} from './context'
 
 const tabs = [
     {
@@ -16,9 +17,11 @@ const tabs = [
 
 export default function App() {
     const [tab, setTab] = useState("vehicleSearch");
+    const [vehicleNo, setVehicleNo] = useState(0);
+    const [queryParam, setQueryParam] = useState({});
 
     return (
-        <>
+        <Context.Provider value={{vehicleNo, setVehicleNo, queryParam, setQueryParam}}>
             <ul className="tabs clearfix">
                 {tabs.map(item => (
                     <li
@@ -36,6 +39,6 @@ export default function App() {
                 <li className="tab active">车辆管理</li>
             </ul>
             <VehicleList />
-        </>
+        </Context.Provider>
     );
 }

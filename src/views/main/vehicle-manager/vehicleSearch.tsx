@@ -46,7 +46,7 @@ export default function App() {
             </Form>
             <div className={style.buttons}>
                 <Button onClick={handleOk} size="small" type="primary">
-                    录入
+                    查询
                 </Button>
                 <Button onClick={handleReset} size="small" disabled>
                     重置
