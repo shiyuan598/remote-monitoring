@@ -1,27 +1,15 @@
 import React, { useRef, useState, useEffect } from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import * as echarts from "echarts";
 import { Select } from "antd";
-
-type chartOptions = {
-    container: HTMLElement;
-    title: string;
-    legend: string[];
-    xAxisName?: string;
-    yAxisName?: string;
-    yAxis?: { max?: number; min: number };
-    seriesType?: string;
-    step?: boolean;
-    series?: object[];
-};
+import dayjs from "dayjs";
+import upImg from "../../../assets/up.png";
 
 export default function App() {
+    const history = useHistory();
+    console.info("收到路由参数：", history.location.state);
 
-  const history = useHistory();
-  const location = useLocation();
-  console.info(history.location.state);
-  
-    const [selected, setSelected] = useState("realtime-position");
+    const [timeSpan, setTimeSpan] = useState("1");
     const [chartObj, setChartObj] = useState<echarts.ECharts>();
     const chartContainer = useRef<HTMLDivElement>(null);
 
@@ -58,7 +46,7 @@ export default function App() {
             },
             xAxis: {
                 type: "category",
-                data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                data: [],
                 axisLine: {
                     lineStyle: {
                         color: "#aaa"
@@ -70,26 +58,27 @@ export default function App() {
             },
             yAxis: {
                 type: "value",
-                minInterval: 1
+                minInterval: 1,
+                min: 10
             },
             series: [
                 {
                     name: "平均油耗",
                     type: "line",
                     smooth: true,
-                    data: [34, 43, 32, 7, 59, 60, 56],
+                    data: [],
                     showSymbol: false
                 },
                 {
                     name: "人工驾驶平均油耗",
                     type: "line",
                     smooth: true,
-                    data: [123, 245, 467, 38, 9, 65, 78],
+                    data: [],
                     showSymbol: false
                 },
                 {
                     name: "自动驾驶平均油耗",
-                    data: [150, 230, 224, 218, 135, 147, 260],
+                    data: [],
                     type: "line",
                     smooth: true,
                     showSymbol: false
@@ -107,6 +96,38 @@ export default function App() {
             window.removeEventListener("resize", handleResize);
         };
     }, []);
+
+    useEffect(() => {
+        if (chartObj) {
+            let arr: any[] = [];
+            switch (timeSpan) {
+                case "1":
+                    arr = [...new Array(30)];
+                    break;
+                case "2":
+                    arr = [...new Array(90)];
+                    break;
+                case "3":
+                    arr = [...new Array(180)];
+                    break;
+                default:
+                    break;
+            }
+            let data = arr.map((v, i) => parseInt(Math.random() * 10 + 25 + ""));
+            const series = [
+                { data },
+                { data: data.map(v => parseInt(v + Math.random() * 10 + "")) },
+                { data: data.map(v => parseInt(v - Math.random() * 10 + "")) }
+            ];
+            chartObj?.setOption({
+                xAxis: {
+                    data: arr.map((v, i) => dayjs().add(-i, "day").format("YYYY-MM-DD")).reverse()
+                },
+                series: series
+            });
+        }
+    }, [chartObj, timeSpan]);
+
     return (
         <>
             <ul className="tabs clearfix">
@@ -121,7 +142,7 @@ export default function App() {
                     <div className="text">当前车速</div>
                     <span className="main-text">16km/h</span>
                     <div className="text">
-                        加速度 5m/s<sup>2</sup>
+                        加速度<img src={upImg} alt="" />5m/s<sup>2</sup>
                     </div>
                 </div>
                 <div className="card">
@@ -147,21 +168,22 @@ export default function App() {
                 <div className="category">油耗统计</div>
                 <div>
                     <Select
-                        size="small"
                         defaultValue="1"
                         style={{ width: 120, marginBottom: 13 }}
-                        onChange={v => {}}
+                        onChange={v => {
+                            setTimeSpan(v);
+                        }}
                         options={[
                             {
                                 value: "1",
                                 label: "近一月"
                             },
                             {
-                                value: "3",
+                                value: "2",
                                 label: "近三月"
                             },
                             {
-                                value: "6",
+                                value: "3",
                                 label: "近半年"
                             }
                         ]}

@@ -3,18 +3,33 @@
     align-items: center;
     height: 60px;
     font-size: 16px;
+    padding: 0 20px;
     background: url("../../assets/zhito.png") 12px center / 180px no-repeat;
-    .time {
-        margin-left: 239px;
+    .item {
         height: 40px;
+        min-width: 120px;
+        text-align: center;
         line-height: 40px;
         border-left: 1px solid #bbb;
-        padding-left: 16px;
+        padding: 0 16px;
         color: #555;
+        .icon {
+            color: #bbb;
+            padding-left: 10px;
+        }
+    }
+    .time {
+        margin-left: 239px;
+        padding-left: 16px;
     }
     .account {
-        flex: 0 0 auto;
-        font-size: 20px;
         margin-left: auto;
+        border: 0;
+        .icon {
+            font-size: 20px;
+            color: #555;
+            padding-right: 10px;
+        }
     }
+    
 }

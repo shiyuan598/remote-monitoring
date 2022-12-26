@@ -46,7 +46,7 @@ $colorActive: #447ed9;
         }
     }
 
-    .card + .card {
+    .card+.card {
         border-left: 0;
     }
 }
@@ -65,12 +65,13 @@ $colorActive: #447ed9;
         background-color: #f9f9f9;
         cursor: pointer;
     }
+
     .tab.top {
         @include bordered;
         border-bottom: 0;
     }
 
-    .tab + .tab {
+    .tab+.tab {
         border-left: 0;
     }
 
@@ -116,6 +117,7 @@ $colorActive: #447ed9;
     padding: 15px 20px 30px;
     @include bordered;
     background-color: $colorNormal;
+
     .text {
         font-size: 13px;
         margin: 15px 10px 30px;
@@ -142,15 +144,30 @@ $colorActive: #447ed9;
         }
     }
 }
+
 .map-container {
     height: calc(100% - 40px - 150px);
+
     #map {
         height: calc(100% - 45px);
+    }
+
+    // 修改map popup样式
+    .minemap-popup-content {
+        padding: 1px 8px 0;
+        font-size: 14px;
+        color: #101010;
+        box-shadow: 1px 1px 4px rgb(0 0 0 / 30%);
     }
 }
 
 // 行驶数据
-
+.card-container .text {
+     img {
+        width: 14px;
+        height: 14px;
+    }
+}
 .chart {
     height: 380px;
 }

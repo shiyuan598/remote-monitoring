@@ -45,7 +45,7 @@ export default function App() {
                 title: "操作",
                 dataIndex: "operation",
                 key: "operation",
-                width: 120,
+                width: 140,
                 render: () => (
                     <div style={{ textAlign: "right" }}>
                         <span className={style.action}>
@@ -83,7 +83,7 @@ export default function App() {
         {
             title: "操作",
             key: "operation",
-            width: 120,
+            width: 140,
             render: (text, record, index) => (
                 <div style={{ textAlign: "right" }}>
                     <span className={style.action}>
@@ -132,7 +132,6 @@ export default function App() {
                 }
             }}
             dataSource={data}
-            size="small"
         />
     );
 }

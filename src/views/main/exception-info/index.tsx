@@ -1,9 +1,11 @@
 import React, { useRef, useState, useEffect } from "react";
 import * as echarts from "echarts";
 import { Select } from "antd";
+import dayjs from "dayjs";
 
 export default function App() {
     const [tab, setTab] = useState("error");
+    const [timeSpan, setTimeSpan] = useState("1");
     const [selected, setSelected] = useState("error");
     const tabs = [
         {
@@ -40,7 +42,7 @@ export default function App() {
             },
             xAxis: {
                 type: "category",
-                data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                data: [],
                 axisLine: {
                     lineStyle: {
                         color: "#aaa"
@@ -59,7 +61,7 @@ export default function App() {
                     name: "异常退出统计",
                     type: "line",
                     smooth: true,
-                    data: [34, 43, 32, 7, 59, 60, 56],
+                    data: [],
                     showSymbol: false
                 }
             ]
@@ -75,6 +77,31 @@ export default function App() {
             window.removeEventListener("resize", handleResize);
         };
     }, [tab]);
+
+    useEffect(() => {
+        if (chartObj) {
+            let arr: any[] = [];
+            switch (timeSpan) {
+                case "1":
+                    arr = [...new Array(30)];
+                    break;
+                case "2":
+                    arr = [...new Array(180)];
+                    break;
+                case "3":
+                    arr = [...new Array(365)];
+                    break;
+                default:
+                    break;
+            }
+            chartObj?.setOption({
+                xAxis: {
+                    data: arr.map((v, i) => dayjs().add(-i, "day").format("YYYY-MM-DD")).reverse()
+                },
+                series: [{ data: arr.map((v, i) => parseInt(Math.random() * 10 + "")) }]
+            });
+        }
+    }, [tab, chartObj, timeSpan]);
     return (
         <>
             <ul className="tabs clearfix">
@@ -132,22 +159,23 @@ export default function App() {
                     <>
                         <div>
                             <Select
-                                size="small"
                                 defaultValue="1"
                                 style={{ width: 120, marginBottom: 13 }}
-                                onChange={v => {}}
+                                onChange={v => {
+                                    setTimeSpan(v);
+                                }}
                                 options={[
                                     {
                                         value: "1",
                                         label: "近一月"
                                     },
                                     {
-                                        value: "3",
-                                        label: "近三月"
+                                        value: "2",
+                                        label: "近半年"
                                     },
                                     {
-                                        value: "6",
-                                        label: "近半年"
+                                        value: "3",
+                                        label: "近一年"
                                     }
                                 ]}
                             />

@@ -24,7 +24,6 @@ export default function App() {
                 labelAlign="left"
                 labelWrap
                 colon={false}
-                size="small"
                 form={form}
                 onFinish={onFinish}>
                 <Form.Item name="type" label="车型" required={true} rules={[{ required: true, message: "请输入车型" }]}>
@@ -52,7 +51,7 @@ export default function App() {
                 </Form.Item>
             </Form>
             <div className={style.buttons}>
-                <Button onClick={handleOk} size="small" type="primary">
+                <Button onClick={handleOk} type="primary">
                     录入
                 </Button>
             </div>

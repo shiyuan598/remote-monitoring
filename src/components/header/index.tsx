@@ -1,46 +1,41 @@
-import React, { useContext } from "react";
-import { useHistory } from "react-router-dom";
-import headerStyle from "./header.module.scss";
+import React, {useContext} from "react";
 import { Popover } from "antd";
-import { UserOutlined } from "@ant-design/icons";
-import { UserContext } from "../../context";
+import { QuestionCircleFilled, UserOutlined } from "@ant-design/icons";
+// import { useHistory } from "react-router-dom";
+import style from "./header.module.scss";
+import { Context } from "../../context";
 
 export default function HeaderComp() {
-    const { userInfo, setUserInfo } = useContext(UserContext) as {
-        userInfo: {
-            name: string;
-            username: string;
-            role: number;
-            token?: string;
-        };
-        setUserInfo: Function;
+    const { updateTime } = useContext(Context) as {
+        updateTime: string;
     };
-    const history = useHistory();
-    const logout = () => {
-        setUserInfo({});
-        localStorage.setItem("userInfo", "{}");
-        sessionStorage.setItem("mapReload", "");
-        history.push("/login");
-    };
+    
+    // const history = useHistory();
+    // const logout = () => {
+    //     setUserInfo({});
+    //     localStorage.setItem("userInfo", "{}");
+    //     sessionStorage.setItem("mapReload", "");
+    //     history.push("/login");
+    // };
+
     return (
-        <div className={headerStyle.header}>
-            <div className={headerStyle.time}>实时数据 2022-12-24 17:30:56</div>
-            {/* <Popover
-                placement="leftTop"
-                content={
-                    <div className="userInfo">
-                        <div>{userInfo.username}</div>
-                        <div className="logout" onClick={logout}>
-                            注销
-                        </div>
-                    </div>
-                }
-                trigger="hover">
-                <span className={headerStyle.account}>
+        <div className={style.header}>
+            <div className={`${style.item} ${style.time}`}>
+                实时数据 {updateTime}
+                <Popover content={<div>Lorem ipsum dolor sit amet consectetur adipisicing elit.</div>} trigger="hover">
+                    <span className={style.icon}>
+                        <QuestionCircleFilled />
+                    </span>
+                </Popover>
+            </div>
+            <div className={`${style.item} ${style.account}`}>
+                <span className={style.icon}>
                     <UserOutlined />
-                    <span className={headerStyle.name}>{userInfo.name}</span>
                 </span>
-            </Popover> */}
+                Admin
+            </div>
+            <div className={`${style.item}`}>个人中心</div>
+            <div className={`${style.item}`}>切换用户</div>
         </div>
     );
 }

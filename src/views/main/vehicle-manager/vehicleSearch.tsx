@@ -22,7 +22,6 @@ export default function App() {
                 labelAlign="left"
                 labelWrap
                 colon={false}
-                size="small"
                 form={form}
                 onFinish={onFinish}>
                 <Form.Item name="type" label="车型">
@@ -41,14 +40,14 @@ export default function App() {
                     <Select placeholder="请选择" />
                 </Form.Item>
                 <Form.Item name="date" label="创建日期">
-                    <RangePicker size="small" />
+                    <RangePicker />
                 </Form.Item>
             </Form>
             <div className={style.buttons}>
-                <Button onClick={handleOk} size="small" type="primary">
+                <Button onClick={handleOk} type="primary">
                     查询
                 </Button>
-                <Button onClick={handleReset} size="small" disabled>
+                <Button onClick={handleReset} disabled>
                     重置
                 </Button>
             </div>

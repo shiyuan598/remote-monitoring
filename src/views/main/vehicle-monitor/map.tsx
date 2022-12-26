@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import { vehicle as vehicleApi } from "../../../api";
-import { message } from "antd";
 
-function Map() {
+function Map(props: { tab: string; vehicleList: any[] }) {
+    const { tab, vehicleList } = props;
+    const history = useHistory();
+    console.info(tab, vehicleList);
     const [map, setMap] = useState(null);
     useEffect(() => {
         /**
@@ -37,68 +40,50 @@ function Map() {
         setMap(map);
     }, []);
 
-    const [vehicles, setVehicles] = useState([]);
-    useEffect(() => {
-        let timer: any = null;
-        const getVehicles = () => {
-            let atHomePage = window.location.href.includes("/desktop/home");
-            if (!atHomePage) {
-                timer = setTimeout(getVehicles, 1000);
-                return;
-            }
-            vehicleApi.getVehiclesPosition().then(v => {
-                if (v.code === 0) {
-                    setVehicles(v.data);
-                    timer = setTimeout(getVehicles, 1000);
-                } else {
-                    message.error("出错了");
-                }
-            });
-        };
-
-        getVehicles();
-
-        return () => {
-            clearTimeout(timer);
-        };
-    }, []);
-
     const [popups, setPopups] = useState([]);
     const [makers, setMakers] = useState([]);
     useEffect(() => {
-        if (map) {
+        if (map && vehicleList.length) {
             // 删除所有markers和popups
             makers.forEach((item: any) => item.remove());
             popups.forEach((item: any) => item.remove());
 
-            let _popups: any = [];
-            let _markers: any = [];
-            vehicles.forEach((item: any) => {
-                let popup = new minemap.Popup({ closeOnClick: true, closeButton: false, offset: [0, -20] })
-                    .setLngLat([item.lon, item.lat])
-                    .setHTML(
-                        `
-          <h4>${item.vehicleNo}</h4>
-        `
-                    )
-                    .addTo(map);
-                _popups.push(popup);
+            if (tab === "realtime-position") {
+                let _popups: any = [];
+                let _markers: any = [];
+                vehicleList.forEach((item: any) => {
+                    let popup = new minemap.Popup({ closeOnClick: false, closeButton: false, offset: [0, -17] })
+                        .setLngLat(item.position)
+                        .setHTML(`<h4>${item.number}</h4>`)
+                        .addTo(map);
+                    _popups.push(popup);
 
-                let marker = new minemap.Marker({
-                    color: "#f30",
-                    rotation: 0,
-                    pitchAlignment: "map",
-                    rotationAlignment: "map",
-                    scale: 0.6
-                })
-                    .setLngLat([item.lon, item.lat])
-                    .addTo(map);
-                _markers.push(marker);
-            });
-            setPopups(_popups);
-            setMakers(_markers);
+                    var el = document.createElement("div");
+                    // 自定义DOM样式 或者通过css类设置
+                    el.style["background" as any] = "url(/images/truck.png) center / 24px no-repeat";
+                    el.style["background-color" as any] = item.state === 1 ? "#3370ff" : "#6d6d6d";
+                    el.style.width = "34px";
+                    el.style.height = "34px";
+                    el.style["border-radius" as any] = "50%";
+                    let marker = new minemap.Marker(el, {
+                        offset: [-17, -17],
+                        pitchAlignment: "map",
+                        rotationAlignment: "map"
+                    })
+                        .setLngLat(item.position)
+                        .addTo(map);
+                    el.addEventListener("click", () => {
+                        console.info("clicked at ", item.number);
+                        // 跳转到车辆行驶数据
+                        history.push("/main/driving-data", { ...item });
+                    });
+                    _markers.push(marker);
+                });
+                setPopups(_popups);
+                setMakers(_markers);
+            }
         }
-    }, [map, vehicles]);
+    }, [map, vehicleList]);
     return <div id="map"></div>;
 }
 
