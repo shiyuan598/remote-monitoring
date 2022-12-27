@@ -49,7 +49,7 @@ export default function App() {
                     }
                 },
                 axisLabel: {
-                    hideOverlap: true
+                    hideOverlap: true,
                 }
             },
             yAxis: {
@@ -81,22 +81,34 @@ export default function App() {
     useEffect(() => {
         if (chartObj) {
             let arr: any[] = [];
+            let formatter = "";
             switch (timeSpan) {
                 case "1":
                     arr = [...new Array(30)];
+                    formatter = "YYYY-MM-DD"
                     break;
                 case "2":
                     arr = [...new Array(180)];
+                    formatter = "YYYY-ww周"
                     break;
                 case "3":
                     arr = [...new Array(365)];
+                    formatter = "YYYY-MM"
                     break;
                 default:
                     break;
             }
             chartObj?.setOption({
                 xAxis: {
-                    data: arr.map((v, i) => dayjs().add(-i, "day").format("YYYY-MM-DD")).reverse()
+                    data: arr.map((v, i) => dayjs().add(-i, "day").format("YYYY-MM-DD")).reverse(),
+                    axisLabel: {
+                        formatter: (value: number, index: number) => {
+                            console.info(index);
+                            const str = value.toString();
+    
+                            return dayjs(str).format(formatter);
+                        }
+                    }
                 },
                 series: [{ data: arr.map((v, i) => parseInt(Math.random() * 10 + "")) }]
             });

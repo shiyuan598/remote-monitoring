@@ -59,7 +59,7 @@ export default function App() {
             yAxis: {
                 type: "value",
                 minInterval: 1,
-                min: 10
+                min: 15
             },
             series: [
                 {
@@ -113,11 +113,11 @@ export default function App() {
                 default:
                     break;
             }
-            let data = arr.map((v, i) => parseInt(Math.random() * 10 + 25 + ""));
+            let data = arr.map((v, i) => parseInt(Math.random() * 5 + 25 + ""));
             const series = [
                 { data },
-                { data: data.map(v => parseInt(v + Math.random() * 10 + "")) },
-                { data: data.map(v => parseInt(v - Math.random() * 10 + "")) }
+                { data: data.map(v => parseInt(v + Math.random() * 5 + "")) },
+                { data: data.map(v => parseInt(v - Math.random() * 5 + "")) }
             ];
             chartObj?.setOption({
                 xAxis: {
@@ -142,7 +142,9 @@ export default function App() {
                     <div className="text">当前车速</div>
                     <span className="main-text">16km/h</span>
                     <div className="text">
-                        加速度<img src={upImg} alt="" />5m/s<sup>2</sup>
+                        加速度
+                        <img src={upImg} alt="" />
+                        5m/s<sup>2</sup>
                     </div>
                 </div>
                 <div className="card">
