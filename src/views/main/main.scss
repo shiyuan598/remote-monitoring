@@ -70,7 +70,7 @@ $colorActive: #447ed9;
         @include bordered;
         border-bottom: 0;
     }
-
+    
     .tab+.tab {
         border-left: 0;
     }
@@ -79,6 +79,12 @@ $colorActive: #447ed9;
         &:hover {
             color: $colorActive;
         }
+    }
+
+    .tab.select {
+        border: 0;
+        float: right;
+        width: initial;
     }
 
     .active {
@@ -127,7 +133,7 @@ $colorActive: #447ed9;
 // 车辆监控
 .vehicle-status {
     .status {
-        min-height: 150px;
+        height: 150px;
         display: flex;
         align-items: center;
 
@@ -136,10 +142,16 @@ $colorActive: #447ed9;
             flex-wrap: wrap;
             margin-bottom: -4px;
             margin-left: 30px;
+            cursor: pointer;
+            max-height: 100px;
+            overflow: auto;
 
             .item {
-                margin-right: 30px;
+                margin-right: 20px;
                 margin-bottom: 4px;
+                border-radius: 2px;
+                padding: 0 5px;
+                background-color: #f5f6f9;
             }
         }
     }
@@ -147,9 +159,31 @@ $colorActive: #447ed9;
 
 .map-container {
     height: calc(100% - 40px - 150px);
+    padding: 5px 20px 0;
+    position: relative;
+
+    .top-bar {
+        margin: 9px 0 0 6px;
+        position: absolute;
+        z-index: 100;
+
+        .vehicle-number-select {
+            margin-right: 20px;
+        }
+
+        .time {
+            display: inline-block;
+            height: 30px;
+            line-height: 30px;
+            padding: 0 16px;
+            background-color: #fff;
+            color: #555;
+            box-shadow: 2px 2px 4px #989898;
+        }
+    }
 
     #map {
-        height: calc(100% - 45px);
+        height: 100%;
     }
 
     // 修改map popup样式
@@ -163,11 +197,12 @@ $colorActive: #447ed9;
 
 // 行驶数据
 .card-container .text {
-     img {
+    img {
         width: 14px;
         height: 14px;
     }
 }
+
 .chart {
     height: 380px;
 }

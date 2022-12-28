@@ -100,11 +100,8 @@ const menus = [
 export default function App() {
     const location = useLocation();
     const history = useHistory();
-    const onClick = (key: string) => {
-        history.push(key, {
-          name: "yhifif",
-          age: 25
-        }); // 跳转到对应的路由
+    const handleMenuClick = (key: string) => {
+        history.push(key); // 跳转到对应的路由
     };
 
     const [selected, setSelected] = useState("");
@@ -117,7 +114,7 @@ export default function App() {
         <div className="sidebar">
             {menus.map(menu => (
                 <div key={menu.id}>
-                    <div className={`menu ${selected === menu.key ? 'active' : ''}`} onClick={()=>{onClick(menu.key)}}>{menu.label}</div>
+                    <div className={`menu ${selected === menu.key ? 'active' : ''}`} onClick={()=>{handleMenuClick(menu.key)}}>{menu.label}</div>
                     <ul>
                         {menu.subMenu.map(subMenu => (
                             <li className="submenu" key={subMenu.id}>

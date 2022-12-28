@@ -1,12 +1,21 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useContext, useEffect } from "react";
 import * as echarts from "echarts";
-import { Select } from "antd";
+import { Select, DatePicker } from "antd";
 import dayjs from "dayjs";
+import type { Dayjs } from "dayjs";
+import { Context } from "../../../context";
+
+const { RangePicker } = DatePicker;
 
 export default function App() {
+    const { vehicleList } = useContext(Context) as {
+        vehicleList: any[];
+    };
+    const [curVehicle, setCurVehicle] = useState<number>();
+    const [searchHistory, setSearchHistory] = useState<any[]>([]);
+
     const [tab, setTab] = useState("error");
-    const [timeSpan, setTimeSpan] = useState("1");
-    const [selected, setSelected] = useState("error");
+
     const tabs = [
         {
             id: "error",
@@ -22,8 +31,32 @@ export default function App() {
         }
     ];
 
+    const [timeSpan, setTimeSpan] = useState([dayjs().add(-1, "month"), dayjs()]);
+
     const [chartObj, setChartObj] = useState<echarts.ECharts>();
     const chartContainer = useRef<HTMLDivElement>(null);
+
+    const onTimeSpanChange = (dates: null | (Dayjs | null)[], dateStrings: string[]) => {
+        if (dates) {
+            setTimeSpan(dates as [Dayjs, Dayjs]);
+        } else {
+            setTimeSpan([]);
+        }
+    };
+
+    // 初始化选择的车牌号
+    useEffect(() => {
+        setCurVehicle(vehicleList[0]?.id);
+    }, [vehicleList]);
+
+    // 查询数据
+    useEffect(() => {
+        if (curVehicle) {
+            const vehicle = vehicleList.find(item => item.id === curVehicle);
+            // 搜索历史
+            setSearchHistory([vehicle, ...searchHistory]);
+        }
+    }, [curVehicle]);
 
     useEffect(() => {
         if (!chartContainer.current) {
@@ -49,7 +82,7 @@ export default function App() {
                     }
                 },
                 axisLabel: {
-                    hideOverlap: true,
+                    hideOverlap: true
                 }
             },
             yAxis: {
@@ -79,36 +112,12 @@ export default function App() {
     }, [tab]);
 
     useEffect(() => {
-        if (chartObj) {
-            let arr: any[] = [];
-            let formatter = "";
-            switch (timeSpan) {
-                case "1":
-                    arr = [...new Array(30)];
-                    formatter = "YYYY-MM-DD"
-                    break;
-                case "2":
-                    arr = [...new Array(180)];
-                    formatter = "YYYY-ww周"
-                    break;
-                case "3":
-                    arr = [...new Array(365)];
-                    formatter = "YYYY-MM"
-                    break;
-                default:
-                    break;
-            }
+        if (chartObj && timeSpan.length) {
+            const days = timeSpan[1].diff(timeSpan[0], "days");
+            const arr: any[] = [...new Array(days)];
             chartObj?.setOption({
                 xAxis: {
-                    data: arr.map((v, i) => dayjs().add(-i, "day").format("YYYY-MM-DD")).reverse(),
-                    axisLabel: {
-                        formatter: (value: number, index: number) => {
-                            console.info(index);
-                            const str = value.toString();
-    
-                            return dayjs(str).format(formatter);
-                        }
-                    }
+                    data: arr.map((v, i) => dayjs().add(-i, "day").format("YYYY-MM-DD")).reverse()
                 },
                 series: [{ data: arr.map((v, i) => parseInt(Math.random() * 10 + "")) }]
             });
@@ -117,10 +126,31 @@ export default function App() {
     return (
         <>
             <ul className="tabs clearfix">
-                <li className="tab top active">车型ABC001</li>
-                <li className="tab top">车型ABC002</li>
-                <li className="tab top">车型ABC003</li>
-                <li className="tab top">车型ABC004</li>
+                {searchHistory.slice(0, 4).map((item, index) => (
+                    <li
+                        key={Math.random()}
+                        className={`tab top ${index === 0 ? "active" : ""}`}
+                        onClick={() => {
+                            setCurVehicle(item.id);
+                        }}>
+                        {item.number}
+                    </li>
+                ))}
+                <li className="tab select">
+                    <Select
+                        placeholder="请选择"
+                        className="vehicle-number-select"
+                        value={curVehicle}
+                        style={{ width: 120 }}
+                        onChange={v => {
+                            setCurVehicle(v);
+                        }}
+                        options={vehicleList.map((item: { id: number; number: string }) => ({
+                            value: item.id,
+                            label: item.number
+                        }))}
+                    />
+                </li>
             </ul>
             <div className="info disable">车型_车牌号_VIN码_智驾系统零部件_软件版本_离线</div>
             <div className="card-container">
@@ -170,26 +200,14 @@ export default function App() {
                 ) : (
                     <>
                         <div>
-                            <Select
-                                defaultValue="1"
-                                style={{ width: 120, marginBottom: 13 }}
-                                onChange={v => {
-                                    setTimeSpan(v);
-                                }}
-                                options={[
-                                    {
-                                        value: "1",
-                                        label: "近一月"
-                                    },
-                                    {
-                                        value: "2",
-                                        label: "近半年"
-                                    },
-                                    {
-                                        value: "3",
-                                        label: "近一年"
-                                    }
+                            <RangePicker
+                                value={[timeSpan[0], timeSpan[1]]}
+                                presets={[
+                                    { label: "近一月", value: [dayjs().add(-1, "month"), dayjs()] },
+                                    { label: "近半年", value: [dayjs().add(-6, "month"), dayjs()] },
+                                    { label: "近一年", value: [dayjs().add(-1, "year"), dayjs()] }
                                 ]}
+                                onChange={onTimeSpanChange}
                             />
                         </div>
                         <div className="chart" ref={chartContainer}></div>

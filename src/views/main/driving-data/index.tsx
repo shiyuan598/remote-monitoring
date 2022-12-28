@@ -1,18 +1,44 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useContext, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import * as echarts from "echarts";
 import { Select } from "antd";
 import dayjs from "dayjs";
+import { Context } from "../../../context";
 import upImg from "../../../assets/up.png";
 
 export default function App() {
     const history = useHistory();
-    console.info("收到路由参数：", history.location.state);
+    const { vehicleList } = useContext(Context) as {
+        vehicleList: any[];
+    };
+    const [curVehicle, setCurVehicle] = useState<number>();
+    const [searchHistory, setSearchHistory] = useState<any[]>([]);
 
     const [timeSpan, setTimeSpan] = useState("1");
     const [chartObj, setChartObj] = useState<echarts.ECharts>();
     const chartContainer = useRef<HTMLDivElement>(null);
 
+    // 初始化选择的车牌号
+    useEffect(() => {
+        console.info("收到路由参数：", history.location.state);
+        const routeParam = history.location.state;
+        if (routeParam) {
+            setCurVehicle((routeParam as { id: number }).id);
+        } else {
+            setCurVehicle(vehicleList[0]?.id);
+        }
+    }, [history, vehicleList]);
+
+    // 查询数据
+    useEffect(() => {
+        if (curVehicle) {
+            const vehicle = vehicleList.find(item => item.id === curVehicle);
+            // 搜索历史
+            setSearchHistory([vehicle, ...searchHistory]);
+        }
+    }, [curVehicle]);
+
+    // 初始化图表
     useEffect(() => {
         if (!chartContainer.current) {
             return;
@@ -131,11 +157,33 @@ export default function App() {
     return (
         <>
             <ul className="tabs clearfix">
-                <li className="tab top active">车型ABC001</li>
-                <li className="tab top">车型ABC002</li>
-                <li className="tab top">车型ABC003</li>
-                <li className="tab top">车型ABC004</li>
+                {searchHistory.slice(0, 4).map((item, index) => (
+                    <li
+                        key={Math.random()}
+                        className={`tab top ${index === 0 ? "active" : ""}`}
+                        onClick={() => {
+                            setCurVehicle(item.id);
+                        }}>
+                        {item.number}
+                    </li>
+                ))}
+                <li className="tab select">
+                    <Select
+                        placeholder="请选择"
+                        className="vehicle-number-select"
+                        value={curVehicle}
+                        style={{ width: 120 }}
+                        onChange={v => {
+                            setCurVehicle(v);
+                        }}
+                        options={vehicleList.map((item: { id: number; number: string }) => ({
+                            value: item.id,
+                            label: item.number
+                        }))}
+                    />
+                </li>
             </ul>
+
             <div className="info active">车型_车牌号_VIN码_智驾系统零部件_软件版本_离线</div>
             <div className="card-container">
                 <div className="card">

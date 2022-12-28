@@ -46,15 +46,15 @@ li {
 /* 滚动条 */
 *::-webkit-scrollbar {
     height: 6px;
-    background-color: #ededed;
-    width: 8px;
+    background-color: #efefef;
+    width: 6px;
 }
 
 *::-webkit-scrollbar-thumb {
     -moz-border-radius: 1px;
     -webkit-border-radius: 1px;
     border-radius: 1px;
-    background-color: #e0e0e0;
+    background-color: #e2e2e2;
 }
 
 * {

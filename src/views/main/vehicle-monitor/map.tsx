@@ -5,7 +5,6 @@ import { vehicle as vehicleApi } from "../../../api";
 function Map(props: { tab: string; vehicleList: any[] }) {
     const { tab, vehicleList } = props;
     const history = useHistory();
-    console.info(tab, vehicleList);
     const [map, setMap] = useState(null);
     useEffect(() => {
         /**
