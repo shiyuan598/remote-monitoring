@@ -164,7 +164,7 @@ export default function App() {
                         onClick={() => {
                             setCurVehicle(item.id);
                         }}>
-                        {item.number}
+                        {item?.number}
                     </li>
                 ))}
                 <li className="tab select">

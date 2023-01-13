@@ -1,18 +1,33 @@
-import {get} from "./fetchTool";
+import {get, post} from "./fetchTool";
 
-function getVehicle(pageNo: number, name="") {
-    return get("/vehicle/list", {
-        pageNo,
-        name
-    });
+function getVehicle(values: { [propName: string]: string | number } = {
+	"createTimeFrom": "",
+	"createTimeTo": "",
+	"model": "",
+	"number": "",
+	"parts": "",
+	"softwareVersion": "",
+	"vin": ""
+}) {
+    return post("/l3-vehicle/info/list", values);
 }
 
-function getVehiclesPosition() {
-    return get("/vehicle/position");
+function addVehicle(values: { [propName: string]: string | number }) {
+    return post("/l3-vehicle/info/add", values);
+}
+
+function updateVehicle(values: { [propName: string]: string | number }) {
+    return post("/l3-vehicle/info/update", values);
+}
+
+function deleteVehicle(id: string) {
+    return get("/l3-vehicle/info/del/" + id);
 }
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
     getVehicle,
-    getVehiclesPosition
+    addVehicle,
+    updateVehicle,
+    deleteVehicle
 }

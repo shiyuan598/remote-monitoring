@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import Map from "./map";
 import { Context } from "../../../context";
-import map from "./map";
+import { monitorApi } from "../../../api";
 
 const { RangePicker } = DatePicker;
 
@@ -32,6 +32,7 @@ export default function App() {
     const history = useHistory();
     const [vehicleOnline, setVehicleOnline] = useState<any>([]);
     const [vehicleOffline, setVehicleOffline] = useState<any>([]);
+    const [vehiclePosition, setVehiclePosition] = useState<any>([]);
     const [tab, setTab] = useState("realtime-position");
     const [timeSpan, setTimeSpan] = useState([dayjs(), dayjs()]);
     const handleClickVehicle = (data: any) => {
@@ -46,10 +47,16 @@ export default function App() {
             setTimeSpan([]);
         }
     };
+
     useEffect(() => {
-        setVehicleOnline(vehicleList.filter(item => item.state === 1));
-        setVehicleOffline(vehicleList.filter(item => item.state === 0));
-    }, [vehicleList]);
+        monitorApi.getVehicleState().then((res) => {
+            setVehicleOnline(res?.data?.onlineVehicleInfoList);
+            setVehicleOffline(res?.data?.offlineVehicleInfoList);
+        });
+        monitorApi.getVehiclePosition().then((res) => {
+            setVehiclePosition(res?.data?.positionDTOList);
+        });
+    }, []);
 
     return (
         <>
@@ -126,7 +133,7 @@ export default function App() {
                         <div className="time">数据更新 {updateTime}</div>
                     )}
                 </div>
-                <Map tab={tab} vehicleList={vehicleList.filter((item: { position: any[] }) => item.position)}></Map>
+                <Map tab={tab} vehicleList={vehiclePosition}></Map>
             </div>
         </>
     );

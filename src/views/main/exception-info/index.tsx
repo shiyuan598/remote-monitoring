@@ -14,11 +14,11 @@ export default function App() {
     const [curVehicle, setCurVehicle] = useState<number>();
     const [searchHistory, setSearchHistory] = useState<any[]>([]);
 
-    const [tab, setTab] = useState("error");
+    const [tab, setTab] = useState("errorcode");
 
     const tabs = [
         {
-            id: "error",
+            id: "errorcode",
             label: "故障码统计"
         },
         {
@@ -190,7 +190,7 @@ export default function App() {
                 ))}
             </ul>
             <div className="statis-container">
-                {tab === "error" ? (
+                {tab === "errorcode" ? (
                     <>
                         <span className="category">当前故障码</span>
                         <p className="text">短期显示故障码code+时间戳，二阶段映射到文字描述</p>

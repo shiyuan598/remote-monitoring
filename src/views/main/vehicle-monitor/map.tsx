@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import { vehicle as vehicleApi } from "../../../api";
 
 function Map(props: { tab: string; vehicleList: any[] }) {
     const { tab, vehicleList } = props;
@@ -52,7 +51,7 @@ function Map(props: { tab: string; vehicleList: any[] }) {
                 let _markers: any = [];
                 vehicleList.forEach((item: any) => {
                     let popup = new minemap.Popup({ closeOnClick: false, closeButton: false, offset: [0, -17] })
-                        .setLngLat(item.position)
+                        .setLngLat([120.683, 31.4125])
                         .setHTML(`<h4>${item.number}</h4>`)
                         .addTo(map);
                     _popups.push(popup);
@@ -60,7 +59,7 @@ function Map(props: { tab: string; vehicleList: any[] }) {
                     var el = document.createElement("div");
                     // 自定义DOM样式 或者通过css类设置
                     el.style["background" as any] = "url(/images/truck.png) center / 24px no-repeat";
-                    el.style["background-color" as any] = item.state === 1 ? "#3370ff" : "#6d6d6d";
+                    el.style["background-color" as any] = item.state === 0 ? "#6d6d6d" : "#3370ff";
                     el.style.width = "34px";
                     el.style.height = "34px";
                     el.style["border-radius" as any] = "50%";
@@ -69,7 +68,7 @@ function Map(props: { tab: string; vehicleList: any[] }) {
                         pitchAlignment: "map",
                         rotationAlignment: "map"
                     })
-                        .setLngLat(item.position)
+                        .setLngLat([120.683, 31.4125])
                         .addTo(map);
                     el.addEventListener("click", () => {
                         console.info("clicked at ", item.number);

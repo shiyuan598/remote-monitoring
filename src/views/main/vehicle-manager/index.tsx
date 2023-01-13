@@ -17,11 +17,16 @@ const tabs = [
 
 export default function App() {
     const [tab, setTab] = useState("vehicleSearch");
-    const [vehicleNo, setVehicleNo] = useState(0);
+    const [vehicleCount, setVehicleCount] = useState(0);
     const [queryParam, setQueryParam] = useState({});
 
+    useEffect(() => {
+      // 切换tab时清空查询参数
+      setQueryParam({});
+    }, [tab]);
+    
     return (
-        <Context.Provider value={{vehicleNo, setVehicleNo, queryParam, setQueryParam}}>
+        <Context.Provider value={{vehicleCount, setVehicleCount, queryParam, setQueryParam}}>
             <ul className="tabs clearfix">
                 {tabs.map(item => (
                     <li
