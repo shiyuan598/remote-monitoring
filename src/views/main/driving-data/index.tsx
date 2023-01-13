@@ -5,6 +5,7 @@ import { Select } from "antd";
 import dayjs from "dayjs";
 import { Context } from "../../../context";
 import upImg from "../../../assets/up.png";
+import { drivingApi } from "../../../api";
 
 export default function App() {
     const history = useHistory();
@@ -13,6 +14,15 @@ export default function App() {
     };
     const [curVehicle, setCurVehicle] = useState<number>();
     const [searchHistory, setSearchHistory] = useState<any[]>([]);
+    const [vehicleInfo, setVehicleInfo] = useState("");
+    const [summary, setSummary] = useState<{
+        speed: string;
+        acceleration: string;
+        controlMode: string;
+        parts: string;
+        totalDistance: string;
+        autoDistance: string;
+    }>({ speed: "/", acceleration: "", controlMode: "/", parts: "", totalDistance: "", autoDistance: "" });
 
     const [timeSpan, setTimeSpan] = useState("1");
     const [chartObj, setChartObj] = useState<echarts.ECharts>();
@@ -33,6 +43,22 @@ export default function App() {
     useEffect(() => {
         if (curVehicle) {
             const vehicle = vehicleList.find(item => item.id === curVehicle);
+            drivingApi.getSummary(vehicle).then(res => {
+                if (res.data) {
+                    const {
+                        model = "",
+                        number = "",
+                        vin = "",
+                        parts = "",
+                        softwareVersion = "",
+                        status = ""
+                    } = res.data.vehicleInfoDTO;
+                    setVehicleInfo(`${model}_${number}_${vin}_${parts}_${softwareVersion}_${status}`);
+                }
+                setSummary({
+                    ...res.data.drivingDataDTO
+                });
+            });
             // 搜索历史
             setSearchHistory([vehicle, ...searchHistory]);
         }
@@ -184,30 +210,30 @@ export default function App() {
                 </li>
             </ul>
 
-            <div className="info active">车型_车牌号_VIN码_智驾系统零部件_软件版本_离线</div>
+            <div className="info active">{vehicleInfo}</div>
             <div className="card-container">
                 <div className="card">
                     <div className="text">当前车速</div>
-                    <span className="main-text">16km/h</span>
-                    <div className="text">
+                    <span className="main-text">{summary.speed}km/h</span>
+                    {summary.acceleration && <div className="text">
                         加速度
                         <img src={upImg} alt="" />
-                        5m/s<sup>2</sup>
-                    </div>
+                        {summary.acceleration}m/s<sup>2</sup>
+                    </div>}
                 </div>
                 <div className="card">
                     <div className="text">当前控制模式</div>
-                    <span className="main-text">Auto Pilot</span>
+                    <span className="main-text">{summary.controlMode}</span>
                 </div>
                 <div className="card">
                     <div className="text">行驶里程统计（总）</div>
-                    <span className="main-text">112km</span>
+                    <span className="main-text">{summary.totalDistance}km</span>
                 </div>
                 <div className="card">
                     <div className="text">自动驾驶里程（总）</div>
                     <span className="main-text">
-                        24.6km
-                        <span className="sub-text">（22%）</span>
+                    {summary.autoDistance}km
+                        <span className="sub-text">（{(Number(summary.autoDistance) / Number(summary.totalDistance) * 100).toFixed(0)}%）</span>
                     </span>
                 </div>
             </div>

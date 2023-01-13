@@ -22,7 +22,7 @@ export default function App() {
             label: "故障码统计"
         },
         {
-            id: "logout",
+            id: "abort",
             label: "异常退出统计"
         },
         {
