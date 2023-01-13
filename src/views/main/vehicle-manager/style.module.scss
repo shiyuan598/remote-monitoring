@@ -20,6 +20,7 @@ $colorActive: #447ed9;
     padding: 25px 20px;
     @include bordered;
     background-color: #fff;
+    height: 170px;
     :global(.ant-form) {
         width: calc(100% - 60px);
         flex: 1;

@@ -1,10 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
+import { monitorApi } from "../../../api";
+
+interface MapType {
+    getCenter: Function;
+    addSource: Function;
+    getSource: Function;
+    addLayer: Function;
+    getLayer: Function;
+    setLayoutProperty: Function;
+}
 
 function Map(props: { tab: string; vehicleList: any[] }) {
     const { tab, vehicleList } = props;
     const history = useHistory();
-    const [map, setMap] = useState(null);
+    const [map, setMap] = useState<MapType>();
+    const [mapLoad, setMapLoad] = useState(false);
     useEffect(() => {
         /**
          * 全局参数设置
@@ -32,19 +43,29 @@ function Map(props: { tab: string; vehicleList: any[] }) {
         map.addControl(new minemap.Fullscreen(), "top-right");
         map.addControl(new minemap.Scale(), "bottom-left");
 
+        map.on("load", () => {
+            setMapLoad(true);
+        });
+
         map.on("click", (e: any) => {
             console.info([e.lngLat.lng, e.lngLat.lat]);
         });
-        setMap(map);
+        setMap(map as MapType);
     }, []);
 
     const [popups, setPopups] = useState([]);
     const [makers, setMakers] = useState([]);
+
     useEffect(() => {
-        if (map && vehicleList.length) {
+        if (map && mapLoad && vehicleList.length) {
             // 删除所有markers和popups
             makers.forEach((item: any) => item.remove());
             popups.forEach((item: any) => item.remove());
+
+            // 隐藏实时轨迹图层
+            if (map.getLayer("realtimeLayer")) {
+                map.setLayoutProperty("realtimeLayer", "visibility", "none");
+            }
 
             if (tab === "realtime-position") {
                 let _popups: any = [];
@@ -80,8 +101,72 @@ function Map(props: { tab: string; vehicleList: any[] }) {
                 setPopups(_popups);
                 setMakers(_markers);
             }
+            if (tab === "realtime-trajectory") {
+                if (!map.getSource("realtimeSource")) {
+                    map.addSource("realtimeSource", {
+                        type: "geojson",
+                        data: { type: "FeatureCollection", features: [] }
+                    });
+                    map.addLayer({
+                        id: "realtimeLayer",
+                        type: "line",
+                        source: "realtimeSource",
+                        layout: {
+                            "line-join": "round",
+                            "line-cap": "round",
+                            "border-visibility": "none" //是否开启线边框
+                        },
+                        paint: {
+                            "line-width": 8,
+                            "line-color": {
+                                type: "categorical",
+                                property: "kind",
+                                stops: [
+                                    [1, "#FF2525"],
+                                    [2, "#00C614"]
+                                ],
+                                default: "#ff0000"
+                            },
+                            "line-border-width": 2, //设置线边框宽度
+                            "line-border-opacity": 1, //设置线边框透明度
+                            "line-border-color": {
+                                stops: [
+                                    [1, "#920000 "],
+                                    [2, "#00830C"]
+                                ]
+                            } //设置线边框颜色
+                        },
+                        minzoom: 7,
+                        maxzoom: 17.5
+                    });
+                } else {
+                    map.setLayoutProperty("realtimeLayer", "visibility", "visible");
+                }
+
+                setTimeout(() => {
+
+                    monitorApi.getPathRealtime().then(() => {});
+                    const center = map.getCenter();
+                    const jsonData = {
+                        type: "FeatureCollection",
+                        features: [
+                            {
+                                type: "Feature",
+                                geometry: {
+                                    type: "LineString",
+                                    coordinates: [
+                                        [center.lng - 0.005, center.lat + 0.005],
+                                        [center.lng + 0.005, center.lat + 0.005]
+                                    ]
+                                }
+                            }
+                        ]
+                    };
+                    map.getSource("realtimeSource").setData(jsonData);
+                }, 100);
+            }
         }
-    }, [map, vehicleList]);
+    }, [map, mapLoad, tab, vehicleList]);
     return <div id="map"></div>;
 }
 

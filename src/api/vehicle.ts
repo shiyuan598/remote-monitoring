@@ -1,14 +1,16 @@
-import {get, post} from "./fetchTool";
+import { get, post } from "./fetchTool";
 
-function getVehicle(values: { [propName: string]: string | number } = {
-	"createTimeFrom": "",
-	"createTimeTo": "",
-	"model": "",
-	"number": "",
-	"parts": "",
-	"softwareVersion": "",
-	"vin": ""
-}) {
+function getVehicle(
+    values: { [propName: string]: string | number } = {
+        createTimeFrom: "",
+        createTimeTo: "",
+        model: "",
+        number: "",
+        parts: "",
+        softwareVersion: "",
+        vin: ""
+    }
+) {
     return post("/l3-vehicle/info/list", values);
 }
 
@@ -30,4 +32,4 @@ export default {
     addVehicle,
     updateVehicle,
     deleteVehicle
-}
+};
