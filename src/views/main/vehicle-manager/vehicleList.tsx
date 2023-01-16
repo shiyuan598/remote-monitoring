@@ -71,7 +71,6 @@ export default function App() {
 
     const [data, setData] = useState<DataType[]>([]);
     useEffect(() => {
-        console.info(queryParam);
         vehicleApi.getVehicle(queryParam as { [propName: string]: string }).then((res) => {
             setData(res?.data?.vehicleInfoDTOList);
         });

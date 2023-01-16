@@ -18,7 +18,6 @@ export default function App() {
         setQueryParam({});
     };
     const onFinish = (values: any) => {
-        console.log("Received values of form: ", values);
         const { model = "", number = "", parts = "", softwareVersion = "", vin = "", date } = values;
         let createTimeFrom = "";
         let createTimeTo = "";

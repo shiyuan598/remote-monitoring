@@ -33,7 +33,7 @@ function getTakeoverStatis(
         id: 0
     }
 ) {
-    return post("/l3-vehicle/monitor/driving/fuel", values);
+    return post("/l3-vehicle/monitor/fault/takeover", values);
 }
 
 // eslint-disable-next-line import/no-anonymous-default-export

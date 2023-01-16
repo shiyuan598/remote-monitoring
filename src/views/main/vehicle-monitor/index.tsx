@@ -32,7 +32,6 @@ export default function App() {
     const history = useHistory();
     const [vehicleOnline, setVehicleOnline] = useState<any>([]);
     const [vehicleOffline, setVehicleOffline] = useState<any>([]);
-    const [vehiclePosition, setVehiclePosition] = useState<any>([]);
     const [tab, setTab] = useState("realtime-position");
     const [timeSpan, setTimeSpan] = useState([dayjs(), dayjs()]);
     const handleClickVehicle = (data: any) => {
@@ -52,9 +51,6 @@ export default function App() {
         monitorApi.getVehicleState().then((res) => {
             setVehicleOnline(res?.data?.onlineVehicleInfoList);
             setVehicleOffline(res?.data?.offlineVehicleInfoList);
-        });
-        monitorApi.getVehiclePosition().then((res) => {
-            setVehiclePosition(res?.data?.positionDTOList);
         });
     }, []);
 
@@ -133,7 +129,7 @@ export default function App() {
                         <div className="time">数据更新 {updateTime}</div>
                     )}
                 </div>
-                <Map tab={tab} vehicleList={vehiclePosition}></Map>
+                <Map tab={tab}></Map>
             </div>
         </>
     );

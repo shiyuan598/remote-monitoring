@@ -11,8 +11,8 @@ interface MapType {
     setLayoutProperty: Function;
 }
 
-function Map(props: { tab: string; vehicleList: any[] }) {
-    const { tab, vehicleList } = props;
+function Map(props: { tab: string; }) {
+    const { tab } = props;
     const history = useHistory();
     const [map, setMap] = useState<MapType>();
     const [mapLoad, setMapLoad] = useState(false);
@@ -57,7 +57,7 @@ function Map(props: { tab: string; vehicleList: any[] }) {
     const [makers, setMakers] = useState([]);
 
     useEffect(() => {
-        if (map && mapLoad && vehicleList.length) {
+        if (map && mapLoad) {
             // 删除所有markers和popups
             makers.forEach((item: any) => item.remove());
             popups.forEach((item: any) => item.remove());
@@ -68,38 +68,40 @@ function Map(props: { tab: string; vehicleList: any[] }) {
             }
 
             if (tab === "realtime-position") {
-                let _popups: any = [];
-                let _markers: any = [];
-                vehicleList.forEach((item: any) => {
-                    let popup = new minemap.Popup({ closeOnClick: false, closeButton: false, offset: [0, -17] })
-                        .setLngLat([120.683, 31.4125])
-                        .setHTML(`<h4>${item.number}</h4>`)
-                        .addTo(map);
-                    _popups.push(popup);
+                monitorApi.getVehiclePosition().then(res => {
+                    const vehicleList = res?.data?.positionDTOList;
+                    let _popups: any = [];
+                    let _markers: any = [];
+                    vehicleList.forEach((item: any) => {
+                        let popup = new minemap.Popup({ closeOnClick: false, closeButton: false, offset: [0, -17] })
+                            .setLngLat([item.longitude, item.latitude])
+                            .setHTML(`<h4>${item.number}</h4>`)
+                            .addTo(map);
+                        _popups.push(popup);
 
-                    var el = document.createElement("div");
-                    // 自定义DOM样式 或者通过css类设置
-                    el.style["background" as any] = "url(/images/truck.png) center / 24px no-repeat";
-                    el.style["background-color" as any] = item.state === 0 ? "#6d6d6d" : "#3370ff";
-                    el.style.width = "34px";
-                    el.style.height = "34px";
-                    el.style["border-radius" as any] = "50%";
-                    let marker = new minemap.Marker(el, {
-                        offset: [-17, -17],
-                        pitchAlignment: "map",
-                        rotationAlignment: "map"
-                    })
-                        .setLngLat([120.683, 31.4125])
-                        .addTo(map);
-                    el.addEventListener("click", () => {
-                        console.info("clicked at ", item.number);
-                        // 跳转到车辆行驶数据
-                        history.push("/main/driving-data", { ...item });
+                        var el = document.createElement("div");
+                        // 自定义DOM样式 或者通过css类设置
+                        el.style["background" as any] = "url(/images/truck.png) center / 24px no-repeat";
+                        el.style["background-color" as any] = item.state === 0 ? "#6d6d6d" : "#3370ff";
+                        el.style.width = "34px";
+                        el.style.height = "34px";
+                        el.style["border-radius" as any] = "50%";
+                        let marker = new minemap.Marker(el, {
+                            offset: [-17, -17],
+                            pitchAlignment: "map",
+                            rotationAlignment: "map"
+                        })
+                            .setLngLat([item.longitude, item.latitude])
+                            .addTo(map);
+                        el.addEventListener("click", () => {
+                            // 跳转到车辆行驶数据
+                            history.push("/main/driving-data", { ...item });
+                        });
+                        _markers.push(marker);
                     });
-                    _markers.push(marker);
+                    setPopups(_popups);
+                    setMakers(_markers);
                 });
-                setPopups(_popups);
-                setMakers(_markers);
             }
             if (tab === "realtime-trajectory") {
                 if (!map.getSource("realtimeSource")) {
@@ -144,7 +146,6 @@ function Map(props: { tab: string; vehicleList: any[] }) {
                 }
 
                 setTimeout(() => {
-
                     monitorApi.getPathRealtime().then(() => {});
                     const center = map.getCenter();
                     const jsonData = {
@@ -165,8 +166,11 @@ function Map(props: { tab: string; vehicleList: any[] }) {
                     map.getSource("realtimeSource").setData(jsonData);
                 }, 100);
             }
+            if (tab === "history-trajectory") {
+                monitorApi.getPathHistory().then(() => {});
+            }
         }
-    }, [map, mapLoad, tab, vehicleList]);
+    }, [map, mapLoad, tab]);
     return <div id="map"></div>;
 }
 

@@ -14,23 +14,31 @@ export default function App() {
     };
     const [curVehicle, setCurVehicle] = useState<number>();
     const [searchHistory, setSearchHistory] = useState<any[]>([]);
-    const [vehicleInfo, setVehicleInfo] = useState("");
-    const [summary, setSummary] = useState<{
-        speed: string;
-        acceleration: string;
-        controlMode: string;
-        parts: string;
-        totalDistance: string;
-        autoDistance: string;
-    }>({ speed: "/", acceleration: "", controlMode: "/", parts: "", totalDistance: "", autoDistance: "" });
-
+    const [vehicleInfo, setVehicleInfo] = useState({
+        createTime: "",
+        id: "",
+        model: "",
+        number: "",
+        parts: "",
+        softwareVersion: "",
+        status: "",
+        updateTime: "",
+        vin: ""
+    });
+    const [summary, setSummary] = useState({
+        speed: "/",
+        acceleration: "",
+        controlMode: "/",
+        parts: "",
+        totalDistance: "",
+        autoDistance: ""
+    });
     const [timeSpan, setTimeSpan] = useState("1");
     const [chartObj, setChartObj] = useState<echarts.ECharts>();
     const chartContainer = useRef<HTMLDivElement>(null);
 
     // 初始化选择的车牌号
     useEffect(() => {
-        console.info("收到路由参数：", history.location.state);
         const routeParam = history.location.state;
         if (routeParam) {
             setCurVehicle((routeParam as { id: number }).id);
@@ -39,25 +47,15 @@ export default function App() {
         }
     }, [history, vehicleList]);
 
-    // 查询数据
+    // 查询total数据
     useEffect(() => {
         if (curVehicle) {
             const vehicle = vehicleList.find(item => item.id === curVehicle);
             drivingApi.getSummary(vehicle).then(res => {
                 if (res.data) {
-                    const {
-                        model = "",
-                        number = "",
-                        vin = "",
-                        parts = "",
-                        softwareVersion = "",
-                        status = ""
-                    } = res.data.vehicleInfoDTO;
-                    setVehicleInfo(`${model}_${number}_${vin}_${parts}_${softwareVersion}_${status}`);
+                    setVehicleInfo(res.data.vehicleInfoDTO);
+                    setSummary(res.data.drivingDataDTO);
                 }
-                setSummary({
-                    ...res.data.drivingDataDTO
-                });
             });
             // 搜索历史
             setSearchHistory([vehicle, ...searchHistory]);
@@ -149,36 +147,51 @@ export default function App() {
         };
     }, []);
 
+    // 根据时间统计油耗
     useEffect(() => {
-        if (chartObj) {
-            let arr: any[] = [];
+        if (curVehicle && chartObj && timeSpan.length) {
+            let dateTo = dayjs().format("YYYY-MM-DD");
+            let dateFrom = "";
             switch (timeSpan) {
                 case "1":
-                    arr = [...new Array(30)];
+                    dateFrom = dayjs().add(-30, "day").format("YYYY-MM-DD");
                     break;
                 case "2":
-                    arr = [...new Array(90)];
+                    dateFrom = dayjs().add(-90, "day").format("YYYY-MM-DD");
                     break;
                 case "3":
-                    arr = [...new Array(180)];
+                    dateFrom = dayjs().add(-180, "day").format("YYYY-MM-DD");
                     break;
                 default:
                     break;
             }
-            let data = arr.map((v, i) => parseInt(Math.random() * 5 + 25 + ""));
-            const series = [
-                { data },
-                { data: data.map(v => parseInt(v + Math.random() * 5 + "")) },
-                { data: data.map(v => parseInt(v - Math.random() * 5 + "")) }
-            ];
-            chartObj?.setOption({
-                xAxis: {
-                    data: arr.map((v, i) => dayjs().add(-i, "day").format("YYYY-MM-DD")).reverse()
-                },
-                series: series
-            });
+            drivingApi
+                .getFuelStatis({
+                    dateFrom,
+                    dateTo,
+                    id: curVehicle + ""
+                })
+                .then(res => {
+                    const arr = res.data.drivingFuelDTOList.filter((v: any) => v.autoFuel) as {
+                        autoFuel: string;
+                        manualFuel: string;
+                        date: string;
+                    }[];
+                    let data = arr.map(v => parseFloat(v.autoFuel) + parseFloat(v.manualFuel));
+                    const series = [
+                        { data },
+                        { data: arr.map(v => parseFloat(v.manualFuel)) },
+                        { data: arr.map(v => parseFloat(v.autoFuel)) }
+                    ];
+                    chartObj?.setOption({
+                        xAxis: {
+                            data: arr.map(v => v.date)
+                        },
+                        series: series
+                    });
+                });
         }
-    }, [chartObj, timeSpan]);
+    }, [curVehicle, chartObj, timeSpan]);
 
     return (
         <>
@@ -210,16 +223,21 @@ export default function App() {
                 </li>
             </ul>
 
-            <div className="info active">{vehicleInfo}</div>
+            <div
+                className={
+                    "info " + (vehicleInfo.status === "离线" ? " disable" : " active")
+                }>{`${vehicleInfo.model}_${vehicleInfo.number}_${vehicleInfo.vin}_${vehicleInfo.parts}_${vehicleInfo.softwareVersion}_${vehicleInfo.status}`}</div>
             <div className="card-container">
                 <div className="card">
                     <div className="text">当前车速</div>
                     <span className="main-text">{summary.speed}km/h</span>
-                    {summary.acceleration && <div className="text">
-                        加速度
-                        <img src={upImg} alt="" />
-                        {summary.acceleration}m/s<sup>2</sup>
-                    </div>}
+                    {summary.acceleration && (
+                        <div className="text">
+                            加速度
+                            <img src={upImg} alt="" />
+                            {summary.acceleration}m/s<sup>2</sup>
+                        </div>
+                    )}
                 </div>
                 <div className="card">
                     <div className="text">当前控制模式</div>
@@ -232,8 +250,10 @@ export default function App() {
                 <div className="card">
                     <div className="text">自动驾驶里程（总）</div>
                     <span className="main-text">
-                    {summary.autoDistance}km
-                        <span className="sub-text">（{(Number(summary.autoDistance) / Number(summary.totalDistance) * 100).toFixed(0)}%）</span>
+                        {summary.autoDistance}km
+                        <span className="sub-text">
+                            （{((Number(summary.autoDistance) / Number(summary.totalDistance)) * 100).toFixed(0)}%）
+                        </span>
                     </span>
                 </div>
             </div>

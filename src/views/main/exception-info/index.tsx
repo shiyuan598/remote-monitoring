@@ -4,6 +4,7 @@ import { Select, DatePicker } from "antd";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import { Context } from "../../../context";
+import { exceptionApi } from "../../../api";
 
 const { RangePicker } = DatePicker;
 
@@ -13,6 +14,25 @@ export default function App() {
     };
     const [curVehicle, setCurVehicle] = useState<number>();
     const [searchHistory, setSearchHistory] = useState<any[]>([]);
+    const [vehicleInfo, setVehicleInfo] = useState({
+        createTime: "",
+        id: "",
+        model: "",
+        number: "",
+        parts: "",
+        softwareVersion: "",
+        status: "",
+        updateTime: "",
+        vin: ""
+    });
+    const [summary, setSummary] = useState({
+        abortCount: "",
+        degradeCount: "",
+        takeoverCount: ""
+    });
+
+    const [currentError, setCurrentError] = useState({ code: "", time: "", desc: "" });
+    const [historyError, setHistoryError] = useState([{ code: "", time: "", desc: "" }]);
 
     const [tab, setTab] = useState("errorcode");
 
@@ -49,15 +69,22 @@ export default function App() {
         setCurVehicle(vehicleList[0]?.id);
     }, [vehicleList]);
 
-    // 查询数据
+    // 查询total数据
     useEffect(() => {
         if (curVehicle) {
             const vehicle = vehicleList.find(item => item.id === curVehicle);
+            exceptionApi.getSummary(vehicle).then(res => {
+                if (res.data) {
+                    setVehicleInfo(res.data.vehicleInfoDTO);
+                    setSummary(res.data.faultInfoDTO);
+                }
+            });
             // 搜索历史
             setSearchHistory([vehicle, ...searchHistory]);
         }
     }, [curVehicle]);
 
+    // 初始化图表
     useEffect(() => {
         if (!chartContainer.current) {
             return;
@@ -112,17 +139,65 @@ export default function App() {
     }, [tab]);
 
     useEffect(() => {
-        if (chartObj && timeSpan.length) {
-            const days = timeSpan[1].diff(timeSpan[0], "days");
-            const arr: any[] = [...new Array(days)];
-            chartObj?.setOption({
-                xAxis: {
-                    data: arr.map((v, i) => dayjs().add(-i, "day").format("YYYY-MM-DD")).reverse()
-                },
-                series: [{ data: arr.map((v, i) => parseInt(Math.random() * 10 + "")) }]
-            });
+        if (!curVehicle) {
+            return;
         }
-    }, [tab, chartObj, timeSpan]);
+        let dateFrom = timeSpan[0].format("YYYY-MM-DD");
+        let dateTo = timeSpan[1].format("YYYY-MM-DD");
+        switch (tab) {
+            case "errorcode":
+                exceptionApi.getErrorcodeStatis({ id: curVehicle + "" }).then(res => {
+                    if (res.data) {
+                        setCurrentError(res.data.currentErrorList[0]);
+                        setHistoryError(res.data.historyErrorList);
+                    }
+                });
+                break;
+            case "abort":
+                exceptionApi
+                    .getAbortStatis({
+                        dateFrom,
+                        dateTo,
+                        id: curVehicle + ""
+                    })
+                    .then(res => {
+                        const arr = res.data.faultCountDTOList.filter((v: any) => v.count) as {
+                            count: string;
+                            date: string;
+                        }[];
+                        chartObj?.setOption({
+                            xAxis: {
+                                data: arr.map(v => v.date)
+                            },
+                            series: [{ data: arr.map(v => parseFloat(v.count)) }]
+                        });
+                    });
+                break;
+            case "takeover":
+                exceptionApi
+                    .getTakeoverStatis({
+                        dateFrom,
+                        dateTo,
+                        id: curVehicle + ""
+                    })
+                    .then(res => {
+                        const arr = res.data.faultCountDTOList.filter((v: any) => v.count) as {
+                            count: string;
+                            date: string;
+                        }[];
+                        chartObj?.setOption({
+                            xAxis: {
+                                data: arr.map(v => v.date)
+                            },
+                            series: [{ data: arr.map(v => parseFloat(v.count)) }]
+                        });
+                    });
+                break;
+
+            default:
+                break;
+        }
+    }, [curVehicle, tab, chartObj, timeSpan]);
     return (
         <>
             <ul className="tabs clearfix">
@@ -152,26 +227,29 @@ export default function App() {
                     />
                 </li>
             </ul>
-            <div className="info disable">车型_车牌号_VIN码_智驾系统零部件_软件版本_离线</div>
+            <div
+                className={
+                    "info " + (vehicleInfo.status === "离线" ? " disable" : " active")
+                }>{`${vehicleInfo.model}_${vehicleInfo.number}_${vehicleInfo.vin}_${vehicleInfo.parts}_${vehicleInfo.softwareVersion}_${vehicleInfo.status}`}</div>
             <div className="card-container">
                 <div className="card">
                     <div className="text">主动接管次数（总）</div>
                     <span className="main-text">
-                        12
+                        {summary.takeoverCount}
                         <span className="sub-text">（次）</span>
                     </span>
                 </div>
                 <div className="card">
                     <div className="text">功能降级次数（总）</div>
                     <span className="main-text">
-                        10
+                        {summary.degradeCount}
                         <span className="sub-text">（次）</span>
                     </span>
                 </div>
                 <div className="card">
                     <div className="text">异常退出统计（总）</div>
                     <span className="main-text">
-                        12
+                        {summary.abortCount}
                         <span className="sub-text">（次）</span>
                     </span>
                 </div>
@@ -193,9 +271,11 @@ export default function App() {
                 {tab === "errorcode" ? (
                     <>
                         <span className="category">当前故障码</span>
-                        <p className="text">短期显示故障码code+时间戳，二阶段映射到文字描述</p>
+                        <p className="text">{`时间：${currentError.time}，故障码：${currentError.code}`}</p>
                         <span className="category">历史故障码</span>
-                        <p className="text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis, iure!</p>
+                        {historyError.map(item => (
+                            <p key={item.time} className="text">{`时间：${item.time}，故障码：${item.code}`}</p>
+                        ))}
                     </>
                 ) : (
                     <>
