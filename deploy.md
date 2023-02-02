@@ -21,14 +21,14 @@ server{
 listen 80;
 server_name localhost;
 
-location / {
-    root /home/remote-monitoring;
+location /web {
+    alias /home/remote-monitoring/build;
     index index.htmtl;
-    try_files $uri $uri/ /index.html;
+    try_files $uri $uri/ /web/index.html;
     }
 }
 
-location /api/ { # 配置api代理
+location /api/ { # 配置api代理, 在同一个端口型下可不加Access-Control-Allow-Origin *
     add_header Access-Control-Allow-Origin *;
     proxy_pass http://172.16.20.46:30823/;
 }
