@@ -81,7 +81,7 @@ function Map(props: { tab: string; }) {
 
                         var el = document.createElement("div");
                         // 自定义DOM样式 或者通过css类设置
-                        el.style["background" as any] = "url(/images/truck.png) center / 24px no-repeat";
+                        el.style["background" as any] = "url(../images/truck.png) center / 24px no-repeat";
                         el.style["background-color" as any] = item.state === 0 ? "#6d6d6d" : "#3370ff";
                         el.style.width = "34px";
                         el.style.height = "34px";
