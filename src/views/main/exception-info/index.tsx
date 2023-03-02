@@ -271,10 +271,10 @@ export default function App() {
                 {tab === "errorcode" ? (
                     <>
                         <span className="category">当前故障码</span>
-                        <p className="text">{`时间：${currentError.time}，故障码：${currentError.code}`}</p>
+                        <p className="text">{`时间：${currentError?.time}，故障码：${currentError?.code}`}</p>
                         <span className="category">历史故障码</span>
                         {historyError.map(item => (
-                            <p key={item.time} className="text">{`时间：${item.time}，故障码：${item.code}`}</p>
+                            <p key={item?.time} className="text">{`时间：${item?.time}，故障码：${item?.code}`}</p>
                         ))}
                     </>
                 ) : (
